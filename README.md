@@ -1,14 +1,54 @@
+<p align="center"><img src="port/meta/banner.png" alt="Bounce Touch 3D" width="512"></p>
+
 # Bounce Touch 3D
 
-Port nativo para Nintendo 3DS de **Bounce Touch** (Symbian S60v5, 2009), reconstruido a partir del
-comportamiento del juego original, al estilo de Ship of Harkinian, re3 u OpenGOAL.
+> ⚠️ **EXPERIMENTAL — DEMO — PRUEBA DE CONCEPTO.** Esto no es un juego terminado: es una demostración de que
+> un juego de Symbian se puede portar de forma nativa a Nintendo 3DS reconstruyendo su comportamiento con
+> evidencia del binario original. Espera fallos, partes sin hacer y cambios frecuentes.
 
-> **Demo en desarrollo.** El nivel 1 se juega en la consola con la cámara y el control táctil del original;
-> los 8 niveles cargan y ejecutan sus guiones. Faltan animaciones, textos y menús, audio, guardado y más.
-> Estado detallado: [`docs/GUIONES.md`](docs/GUIONES.md) (lista de reglas y su evidencia) y [`MAPA.md`](MAPA.md).
+Port nativo para Nintendo 3DS de **Bounce Touch** (Symbian S60v5, 2009), al estilo de Ship of Harkinian,
+re3 u OpenGOAL.
 
-*Native Nintendo 3DS port of Bounce Touch (Symbian, 2009), rebuilt from the original game's behaviour. Work in
-progress. Contains no game data or code: you need your own copy of the game.*
+**Qué funciona en esta demo:** el nivel 1 se juega en la consola con la física, la cámara y el control táctil
+del original (verificados fotograma a fotograma contra el juego original); los 8 niveles cargan y ejecutan
+sus guiones; 3D estereoscópico a 60 FPS.
+**Qué falta:** animaciones, textos y menús, audio, guardado, el resto de formas de la bola y objetos de cada
+nivel. Estado detallado: [`docs/GUIONES.md`](docs/GUIONES.md) y [`MAPA.md`](MAPA.md).
+
+*Experimental native Nintendo 3DS port of Bounce Touch (Symbian, 2009) — a proof of concept, not a finished
+game. Contains no game data or code: you need your own copy of the game.*
+
+<p align="center">
+<img src="docs/capturas/nivel1_intro.png" width="400" alt="Nivel 1, intro">
+<img src="docs/capturas/nivel1_juego.png" width="400" alt="Nivel 1">
+<img src="docs/capturas/nivel6.png" width="400" alt="Nivel 6">
+<img src="docs/capturas/nivel8.png" width="400" alt="Nivel 8">
+</p>
+
+## ¿Quieres apoyar?
+
+Hasta ahora el proyecto se ha hecho con herramientas automatizadas (emulación, trazas, comparadores) y
+mucha paciencia. Para llevarlo de demo a juego completo **buscamos formar un equipo de personas**:
+programación en C++ y 3DS (citro3d), ingeniería inversa de ARM/Symbian, pruebas en consola real y quien
+conserve el juego original y pueda grabar partidas de referencia. Si te interesa, abre un *issue* o una
+*discussion* en este repositorio.
+
+## Instalar la demo (FBI)
+
+1. Escanea el QR con **FBI** (*Remote Install → Scan QR Code*) para instalar el `.cia`
+   (o descarga `Bounce-Touch-3D.cia` / `.3dsx` de [Releases](../../releases/latest)):
+
+   <img src="docs/capturas/qr_cia.png" alt="QR del .cia" width="180">
+
+2. **Pon los datos de tu copia del juego en la SD.** El `.cia` no lleva nada del juego original. En tu
+   ordenador, convierte tu `Bounce Touch v1.00(57).sis` (requisitos en «Compilar»):
+
+   ```sh
+   python3 tools/convert_assets.py "Bounce Touch v1.00(57).sis" bounce-touch-3d
+   ```
+
+   y copia la carpeta `bounce-touch-3d` a la SD en `/3ds/bounce-touch-3d/` (dentro debe haber `scenes/`,
+   `tex/`...). Si faltan los datos, el juego te lo dice en la pantalla de abajo.
 
 ## Qué hay y qué no
 
@@ -20,6 +60,9 @@ nada se descarga ni se sube.
 El código del juego se ha estudiado (Ghidra, emulación) solo para **entender** su comportamiento, que se
 reimplementa con código nuevo. Cada regla del motor lleva la dirección del binario de la que sale y, cuando se
 puede, un test que la compara con el original (ver «Método»).
+
+Las capturas muestran el port en Azahar con datos convertidos de una copia propia; el repositorio no
+contiene esos datos.
 
 Proyecto no oficial, sin relación con Rovio ni Nokia. Bounce y Bounce Touch son marcas de sus propietarios.
 

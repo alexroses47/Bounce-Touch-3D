@@ -11,7 +11,7 @@ mkdir -p "$SD" "$OUT"
 print -l -- "$@" > "$SD/bt_auto.txt"
 rm -f "$SD"/bt_shot_*.bmp(N) "$SD/bt_log.txt"
 
-~/Applications/Azahar.app/Contents/MacOS/azahar "$ROOT/bounce.3dsx" > /dev/null 2>&1 &
+~/Applications/Azahar.app/Contents/MacOS/azahar "${BOUNCE_3DSX:-$ROOT/bounce.3dsx}" > /dev/null 2>&1 &
 P=$!
 for i in {1..120}; do
 	grep -q "FIN" "$SD/bt_log.txt" 2>/dev/null && break

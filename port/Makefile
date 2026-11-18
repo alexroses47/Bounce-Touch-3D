@@ -32,8 +32,8 @@ include $(DEVKITARM)/3ds_rules
 #     - <libctru folder>/default_icon.png
 #---------------------------------------------------------------------------------
 TARGET		:=	bounce
-APP_TITLE := Bounce Touch 3DS
-APP_DESCRIPTION := Unofficial native port (bring your own .sis)
+APP_TITLE := Bounce Touch 3D
+APP_DESCRIPTION := Demo experimental (usa tu propio .sis)
 APP_AUTHOR := Not made or endorsed by Rovio or Nokia
 ICON := meta/icon.png
 BUILD		:=	build

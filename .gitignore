@@ -21,3 +21,5 @@ tools/.venv/
 __pycache__/
 *.pyc
 .DS_Store
+
+port/release/

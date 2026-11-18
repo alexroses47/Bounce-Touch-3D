@@ -51,7 +51,17 @@ constexpr int MAX_STEPS = 8;
 constexpr float FOV_Y = 55.0f;
 constexpr float IOD_MAX = 80.0f;   // como el 8 de celeste64-3ds (foco a 60) con la cámara a 600
 
+// Datos convertidos del .sis de cada usuario: dentro del ejecutable (romfs, build local) o en la SD
+// (build público: el .cia/.3dsx no lleva nada del juego).
 const char* g_dataRoot = "romfs:/";
+static const char* SD_DATA = "sdmc:/3ds/bounce-touch-3d/";
+
+static bool fileExists(const char* path)
+{
+	FILE* f = fopen(path, "rb");
+	if (f) fclose(f);
+	return f != nullptr;
+}
 
 // ---------------------------------------------------------------- registro
 static FILE* logFile;
@@ -270,7 +280,33 @@ int main()
 	Result rc = romfsInit();
 	bool autoMode = loadAutoScript();
 	logFile = fopen("sdmc:/bt_log.txt", "w");   // siempre: diagnóstico en la consola real
-	logf_("Bounce Touch 3DS - romfs %s (0x%08lX)\n", R_SUCCEEDED(rc) ? "ok" : "ERROR", rc);
+	logf_("Bounce Touch 3D - romfs %s (0x%08lX)\n", R_SUCCEEDED(rc) ? "ok" : "ERROR", rc);
+	if (!fileExists("romfs:/scenes/skybean_level01.bsc"))
+	{
+		g_dataRoot = SD_DATA;
+		char probe[96];
+		snprintf(probe, sizeof(probe), "%sscenes/skybean_level01.bsc", SD_DATA);
+		logf_("datos en la SD: %s\n", SD_DATA);
+		if (!fileExists(probe))
+		{
+			printf("\x1b[2J\x1b[1;1HBounce Touch 3D (demo)\n\n"
+				"No encuentro los datos del juego.\n\n"
+				"Este programa no incluye nada del\njuego original. Convierte tu copia\n"
+				"(Bounce Touch v1.00(57).sis) con\ntools/convert_assets.py y copia el\n"
+				"resultado en la SD:\n\n  %s\n\n"
+				"Instrucciones: github.com/\nalexroses47/Bounce-Touch-3D\n\nPulsa START para salir.", SD_DATA);
+			while (aptMainLoop())
+			{
+				hidScanInput();
+				if (hidKeysDown() & KEY_START) break;
+				gspWaitForVBlank();
+			}
+			if (logFile) fclose(logFile);
+			romfsExit();
+			gfxExit();
+			return 0;
+		}
+	}
 	C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
 	logf_("citro3d ok, linear libre %lu KB\n", linearSpaceFree() / 1024);
 
