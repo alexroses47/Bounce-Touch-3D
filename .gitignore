@@ -1,0 +1,23 @@
+# Solo código propio. El .sis, lo extraído y convertido de él, la ingeniería inversa (re/, Ghidra),
+# las trazas del juego y los proyectos de terceros se quedan fuera: lista blanca.
+/*
+!/.gitignore
+!/README.md
+!/LICENSE
+!/MAPA.md
+!/docs/
+!/port/
+!/tools/
+!/tests/
+
+port/build/
+port/romfs
+port/*.3dsx
+port/*.elf
+port/*.smdh
+port/host/build/
+tests/build/
+tools/.venv/
+__pycache__/
+*.pyc
+.DS_Store

@@ -1,0 +1,41 @@
+{
+ "pos": {
+  "first": null,
+  "pct": 100.0,
+  "max": 0.0
+ },
+ "vel": {
+  "first": 13296,
+  "pct": 100.0,
+  "max": 1208.547
+ },
+ "ground": {
+  "first": 61,
+  "pct": 38.5,
+  "max": 1
+ },
+ "contact": {
+  "first": 139,
+  "pct": 38.89,
+  "max": 1
+ },
+ "eye": {
+  "first": 1733,
+  "pct": 84.84,
+  "max": 2094.193
+ },
+ "target": {
+  "first": 1750,
+  "pct": 99.33,
+  "max": 2425.647
+ },
+ "normal": {
+  "first": 88,
+  "pct": 99.15,
+  "max": 1.414
+ },
+ "_frames": [
+  1,
+  20260
+ ]
+}

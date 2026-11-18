@@ -1,0 +1,343 @@
+<title>Bounce Touch 3DS: bitácora del port</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: una columna de lectura (~70ch) con tablas y diagramas que pueden ensancharse; acento = el rojo de la bola, usado con moderación */
+:root {
+  --bg: #f6f7f4;
+  --surface: #ffffff;
+  --fg: #1c2420;
+  --muted: #5b6760;
+  --line: #d9ded8;
+  --accent: #cf2f28;
+  --leaf: #3f8a3a;
+  --leaf-soft: #e3efdf;
+  --accent-soft: #fbe7e5;
+  --code-bg: #eef1ec;
+  --display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141917; --surface: #1c2320; --fg: #e6ebe7; --muted: #9aa69f; --line: #2e3833;
+    --accent: #f0605a; --leaf: #7cc675; --leaf-soft: #1f3020; --accent-soft: #3a1d1c; --code-bg: #222b27;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141917; --surface: #1c2320; --fg: #e6ebe7; --muted: #9aa69f; --line: #2e3833;
+  --accent: #f0605a; --leaf: #7cc675; --leaf-soft: #1f3020; --accent-soft: #3a1d1c; --code-bg: #222b27;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+main { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 56px; }
+header.hero { padding-top: 56px; display: flex; flex-direction: column; gap: 16px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(34px, 6vw, 56px); line-height: 1.02; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+h1 .dot { color: var(--accent); }
+h2 { font-family: var(--display); font-weight: 600; font-size: clamp(24px, 3.4vw, 30px); margin: 0 0 4px; text-wrap: balance; }
+h3 { font-size: 17px; margin: 0; font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+.lead { font-size: 18px; color: var(--muted); max-width: 62ch; }
+section { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+code, .mono { font-family: var(--mono); font-size: .9em; }
+code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+.figures { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
+.figure { border-top: 2px solid var(--fg); padding-top: 10px; display: flex; flex-direction: column; gap: 2px; }
+.figure b { font-family: var(--display); font-size: 30px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.figure span { font-size: 13px; color: var(--muted); }
+.answer { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 6px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; }
+.rules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 28px; }
+.rules div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rules b { font-size: 15px; }
+.rules span { color: var(--muted); font-size: 14px; }
+.diagram { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; overflow-x: auto; }
+.diagram pre.mermaid { margin: 0; background: transparent; text-align: center; }
+ol.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+ol.timeline li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+ol.timeline li:last-child { border-bottom: 0; }
+.num { font-family: var(--display); font-weight: 800; font-size: 26px; line-height: 1; color: var(--leaf); }
+.todo .num { color: var(--muted); }
+.timeline .meta { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.timeline p { font-size: 15px; }
+.chip { display: inline-block; font-family: var(--mono); font-size: 11px; letter-spacing: .04em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; vertical-align: 2px; margin-left: 6px; }
+.chip.done { background: var(--leaf-soft); color: var(--leaf); }
+.chip.pending { background: var(--accent-soft); color: var(--accent); }
+.charts { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+figure.chart { margin: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+figure.chart figcaption { font-size: 14px; color: var(--muted); }
+figure.chart figcaption b { color: var(--fg); font-weight: 600; }
+.chart-box { overflow-x: auto; }
+.chart-box svg { width: 100%; min-width: 480px; height: auto; display: block; }
+svg text { fill: var(--muted); font-family: var(--mono); font-size: 12px; }
+svg text.v { fill: var(--fg); font-weight: 500; }
+svg .grid { stroke: var(--line); stroke-width: 1; }
+svg .bar-a { fill: var(--leaf); }
+svg .bar-b { fill: var(--accent); }
+svg .bar-c { fill: var(--muted); }
+.legend { display: flex; gap: 18px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: 0; }
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.card p { font-size: 15px; color: var(--muted); }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+tr:last-child td { border-bottom: 0; }
+td.n { font-variant-numeric: tabular-nums; font-family: var(--mono); white-space: nowrap; }
+.lessons { display: flex; flex-direction: column; gap: 6px; }
+.lessons p { padding-left: 14px; border-left: 2px solid var(--accent); }
+footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 16px; }
+a { color: var(--leaf); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 640px) {
+  .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rules, .cards { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+
+<main>
+  <header class="hero">
+    <span class="eyebrow">Symbian S60v5 → Nintendo 3DS · noviembre 2026</span>
+    <h1>Bounce Touch en la 3DS<span class="dot">.</span></h1>
+    <p class="lead">Cómo se llevó un juego de móvil de 2009 a la 3DS como port nativo, del ejecutable comprimido a 60 FPS en una Old 3DS real. Una guía del método para reutilizarlo en otros ports.</p>
+    <div class="figures">
+      <div class="figure"><b>190</b><span>clases C++ recuperadas de la RTTI</span></div>
+      <div class="figure"><b>15/15</b><span>escenas leídas sin un byte de más</span></div>
+      <div class="figure"><b>6,8 s</b><span>del .sis al romfs de la 3DS</span></div>
+      <div class="figure"><b>60 FPS</b><span>en hardware real, 8 niveles</span></div>
+    </div>
+  </header>
+
+  <section aria-labelledby="estado">
+    <h2 id="estado">¿Falta mucho?</h2>
+    <div class="answer">
+      <p><b>La cámara tiene arreglo rápido.</b> La actual se coloca detrás de la bola a distancia fija y no comprueba el escenario. Por eso, cuando el camino sube o gira, atraviesa las lomas. Lanzar un rayo contra la colisión y acercarla si choca cabe en una sesión corta.</p>
+      <p><b>Que el juego funcione entero no es rápido.</b> La base está hecha: formatos, conversión, render, colisión y física. Falta la mitad que lo convierte en juego: los guiones de los niveles (48 verbos de acción con 2280 usos), los objetos que se mueven, las otras formas de la bola, la cámara del original, el control táctil y los menús. Vamos por un 40 %. Ya no queda ningún formato por descubrir: queda leer comportamiento y reescribirlo.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="reglas">
+    <h2 id="reglas">Las reglas del proyecto</h2>
+    <div class="rules">
+      <div><b>Solo código propio en el repositorio</b><span>Ni assets ni niveles. Cada usuario aporta su .sis y lo convierte en su equipo.</span></div>
+      <div><b>Ghidra para entender, no para copiar</b><span>Lo aprendido se escribe con palabras propias y se reimplementa desde ahí.</span></div>
+      <div><b>Nada de DRM</b><span>La compresión BytePair es el formato estándar de los ejecutables E32.</span></div>
+      <div><b>Una revisión por hito</b><span>Cada hito se entrega con números y espera el visto bueno.</span></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="flujo">
+    <h2 id="flujo">Dos caminos que solo se tocan en papel</h2>
+    <p>Los <b>datos</b> se extraen y se convierten. El <b>comportamiento</b> se lee en Ghidra, se describe en documentos propios y se escribe de nuevo.</p>
+    <div class="diagram">
+<pre class="mermaid">
+flowchart LR
+  SIS[".sis del usuario"] --> EXT["sis_extract.py<br/>SHA-1 por archivo"]
+  EXT --> HGR[".hgr escenas"]
+  EXT --> NTX[".ntx imágenes"]
+  EXT --> WAV[".wav 8 kHz"]
+  EXT --> BIN["textos y fuente"]
+  EXT --> EXE["Bounce.exe"]
+  HGR --> CONV["convert_assets.py"]
+  NTX --> CONV
+  WAV --> CONV
+  BIN --> CONV
+  CONV --> ROMFS["romfs 3DS<br/>.bsc .t3x .ogg .bft"]
+  ROMFS --> ENGINE["port citro3d<br/>render · colisión · física"]
+  EXE --> E32["e32_unpack.py"] --> GHIDRA["Ghidra + scripts"]
+  GHIDRA --> NOTES["docs/FISICA.md<br/>palabras propias"]
+  NOTES --> ENGINE
+</pre>
+    </div>
+  </section>
+
+  <section aria-labelledby="hitos">
+    <h2 id="hitos">Hitos</h2>
+    <ol class="timeline">
+      <li><span class="num">1</span><div><h3>Inventario <span class="chip done">hecho</span></h3><p>Qué hay en el paquete y qué formatos están documentados.</p><span class="meta">260 archivos · 8,2 MB · 157 .ntx · 77 .wav · 15 .hgr</span></div></li>
+      <li><span class="num">2</span><div><h3>Ghidra <span class="chip done">hecho</span></h3><p>Ejecutable descomprimido, imports con nombre, árbol de clases desde la RTTI y funciones del motor identificadas por sus cadenas.</p><span class="meta">177 vtables · 1233 de 3162 funciones con nombre</span></div></li>
+      <li><span class="num">3</span><div><h3>Formato .hgr <span class="chip done">hecho</span></h3><p>Especificación, lector, visor 3D en el navegador, exportación a glTF y render de referencia.</p><span class="meta">1124 primitivas · 28 968 triángulos</span></div></li>
+      <li><span class="num">4</span><div><h3>Conversión <span class="chip done">hecho</span></h3><p>Del .sis al romfs en un comando, validado con ida y vuelta y reproducible byte a byte.</p><span class="meta">256 archivos · 3,67 MB · 6,8 s</span></div></li>
+      <li><span class="num">5</span><div><h3>Motor <span class="chip done">hecho</span></h3><p>Nivel, colisión esfera-triángulo, física de la bola reimplementada y 3D estereoscópico.</p><span class="meta">8 niveles · 60 FPS en Old 3DS</span></div></li>
+      <li class="todo"><span class="num">6</span><div><h3>Juego completo <span class="chip pending">pendiente</span></h3><p>Guiones de los niveles, objetos móviles, formas de bola, control táctil, menús, audio, guardado y .cia.</p></div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="ghidra">
+    <h2 id="ghidra">Del ejecutable a un mapa legible</h2>
+    <p>El ejecutable no trae símbolos, pero sí información de tipos de C++ y cadenas de un motor con código público. Con eso, dos tercios del trabajo de nombrar se automatizan.</p>
+    <div class="diagram">
+<pre class="mermaid">
+flowchart TD
+  A["code.bin<br/>1,4 MB ARM/Thumb"] --> B["SymbianE32Setup.java<br/>bloques + 539 imports"]
+  B --> C["Análisis automático<br/>2621 funciones"]
+  C --> D["rtti_scan.py<br/>190 clases y herencia"]
+  C --> E["ka3d_strings.py<br/>336 literales del motor"]
+  D --> F["ApplyClassInfo.java"]
+  E --> F
+  F --> G["3162 funciones<br/>1233 con nombre"]
+  G --> H["DumpClasses + decomp_pretty<br/>lectura local"]
+</pre>
+    </div>
+    <div class="charts">
+      <figure class="chart">
+        <figcaption><b>Clases por origen.</b> La mitad es código del juego; el resto, el motor KA3D, el renderizador N3D de Nokia (sin código público) y la capa de S60.</figcaption>
+        <div class="chart-box">
+          <svg viewBox="0 0 560 170" role="img" aria-label="Clases por origen: juego 97, KA3D 68, N3D 15, S60 10">
+            <line class="grid" x1="130" y1="10" x2="130" y2="150"/>
+            <line class="grid" x1="230" y1="10" x2="230" y2="150"/>
+            <line class="grid" x1="330" y1="10" x2="330" y2="150"/>
+            <line class="grid" x1="430" y1="10" x2="430" y2="150"/>
+            <text x="126" y="20" text-anchor="end">Juego</text>
+            <rect class="bar-b" x="130" y="10" width="388" height="22" rx="2"/>
+            <text class="v" x="524" y="26">97</text>
+            <text x="126" y="55" text-anchor="end">KA3D</text>
+            <rect class="bar-a" x="130" y="45" width="272" height="22" rx="2"/>
+            <text class="v" x="408" y="61">68</text>
+            <text x="126" y="90" text-anchor="end">N3D (Nokia)</text>
+            <rect class="bar-c" x="130" y="80" width="60" height="22" rx="2"/>
+            <text class="v" x="196" y="96">15</text>
+            <text x="126" y="125" text-anchor="end">S60</text>
+            <rect class="bar-c" x="130" y="115" width="40" height="22" rx="2"/>
+            <text class="v" x="176" y="131">10</text>
+            <text x="130" y="166" text-anchor="middle">0</text>
+            <text x="230" y="166" text-anchor="middle">25</text>
+            <text x="330" y="166" text-anchor="middle">50</text>
+            <text x="430" y="166" text-anchor="middle">75</text>
+          </svg>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="datos">
+    <h2 id="datos">Datos: entenderlos, convertirlos, comprobarlos</h2>
+    <div class="cards">
+      <div class="card"><h3>Validar hasta el último byte</h3><p>Si el lector termina justo donde termina el archivo, el formato está entendido. Los identificadores de control <code>0x12345600 + n</code> señalan el punto exacto de un desfase.</p></div>
+      <div class="card"><h3>Mirar una imagen conocida</h3><p>El enum público llamaba <code>A4B4G4R4</code> al formato 16. La bola salía azul; con ARGB sale roja, como en el juego.</p></div>
+      <div class="card"><h3>Ida y vuelta en cada conversión</h3><p>Cada escena convertida se vuelve a leer y se compara con el original antes de escribirla.</p></div>
+      <div class="card"><h3>Formatos a medida de la GPU</h3><p>Posiciones en <code>int16</code> que escala el shader del PICA200, y vértices listos para memoria lineal: la 3DS los usa sin copiarlos.</p></div>
+      <div class="card"><h3>Salida reproducible</h3><p>Con un número de serie fijo en los <code>.ogg</code>, el romfs sale idéntico byte a byte en cada conversión.</p></div>
+      <div class="card"><h3>Comprobar lo que no se ve</h3><p>Cada <code>.ogg</code> dura exactamente lo mismo que su <code>.wav</code>, muestra a muestra, para que los bucles de música enlacen.</p></div>
+    </div>
+    <figure class="chart">
+      <figcaption><b>Contenido del romfs (KB).</b> 3,67 MB en total. Las texturas y las escenas ocupan dos tercios.</figcaption>
+      <div class="chart-box">
+        <svg viewBox="0 0 560 250" role="img" aria-label="romfs en KB: texturas 1139, escenas 1113, audio 716, fuente 385, interfaz 270, textos 114, partículas 16">
+          <line class="grid" x1="100" y1="8" x2="100" y2="222"/>
+          <line class="grid" x1="240" y1="8" x2="240" y2="222"/>
+          <line class="grid" x1="380" y1="8" x2="380" y2="222"/>
+          <line class="grid" x1="520" y1="8" x2="520" y2="222"/>
+          <text x="94" y="23" text-anchor="end">texturas 3D</text><rect class="bar-a" x="100" y="8" width="398.7" height="22" rx="2"/><text class="v" x="504" y="24">1139</text>
+          <text x="94" y="53" text-anchor="end">escenas</text><rect class="bar-a" x="100" y="38" width="389.6" height="22" rx="2"/><text class="v" x="495" y="54">1113</text>
+          <text x="94" y="83" text-anchor="end">audio</text><rect class="bar-c" x="100" y="68" width="250.6" height="22" rx="2"/><text class="v" x="356" y="84">716</text>
+          <text x="94" y="113" text-anchor="end">fuente</text><rect class="bar-c" x="100" y="98" width="134.8" height="22" rx="2"/><text class="v" x="240" y="114">385</text>
+          <text x="94" y="143" text-anchor="end">interfaz</text><rect class="bar-c" x="100" y="128" width="94.5" height="22" rx="2"/><text class="v" x="200" y="144">270</text>
+          <text x="94" y="173" text-anchor="end">textos</text><rect class="bar-c" x="100" y="158" width="39.9" height="22" rx="2"/><text class="v" x="146" y="174">114</text>
+          <text x="94" y="203" text-anchor="end">partículas</text><rect class="bar-c" x="100" y="188" width="5.6" height="22" rx="2"/><text class="v" x="112" y="204">16</text>
+          <text x="100" y="240" text-anchor="middle">0</text>
+          <text x="240" y="240" text-anchor="middle">400</text>
+          <text x="380" y="240" text-anchor="middle">800</text>
+          <text x="520" y="240" text-anchor="middle">1200</text>
+        </svg>
+      </div>
+    </figure>
+  </section>
+
+  <section aria-labelledby="motor">
+    <h2 id="motor">Motor y pruebas</h2>
+    <p>El banco de pruebas maneja el emulador con un guion (<code>level</code>, <code>wait 60</code>, <code>hold UP+A 30</code>, <code>shot</code>, <code>log</code>) y devuelve capturas y la posición de la bola. Un render de referencia en Python, con la misma cámara, separa los fallos de datos de los del motor.</p>
+    <figure class="chart">
+      <figcaption><b>Triángulos por nivel, en orden de juego.</b> Lo que se dibuja frente a lo que se prueba para colisión. Todos van a 60 FPS en una Old 3DS.</figcaption>
+      <div class="legend"><span><i style="background: var(--leaf)"></i>dibujados por cuadro</span><span><i style="background: var(--accent)"></i>de colisión</span></div>
+      <div class="chart-box">
+        <svg viewBox="0 0 560 262" role="img" aria-label="Triángulos dibujados y de colisión por nivel 1 a 8">
+          <line class="grid" x1="50" y1="30" x2="550" y2="30"/><text x="44" y="34" text-anchor="end">4000</text>
+          <line class="grid" x1="50" y1="80" x2="550" y2="80"/><text x="44" y="84" text-anchor="end">3000</text>
+          <line class="grid" x1="50" y1="130" x2="550" y2="130"/><text x="44" y="134" text-anchor="end">2000</text>
+          <line class="grid" x1="50" y1="180" x2="550" y2="180"/><text x="44" y="184" text-anchor="end">1000</text>
+          <line class="grid" x1="50" y1="230" x2="550" y2="230"/><text x="44" y="234" text-anchor="end">0</text>
+          <rect class="bar-a" x="64" y="56.35" width="20" height="173.65"/><rect class="bar-b" x="86" y="167.8" width="20" height="62.2"/><text x="85" y="250" text-anchor="middle">1</text>
+          <rect class="bar-a" x="124" y="96.45" width="20" height="133.55"/><rect class="bar-b" x="146" y="166.35" width="20" height="63.65"/><text x="145" y="250" text-anchor="middle">2</text>
+          <rect class="bar-a" x="184" y="49.75" width="20" height="180.25"/><rect class="bar-b" x="206" y="125.55" width="20" height="104.45"/><text x="205" y="250" text-anchor="middle">3</text>
+          <rect class="bar-a" x="244" y="107.6" width="20" height="122.4"/><rect class="bar-b" x="266" y="71.15" width="20" height="158.85"/><text x="265" y="250" text-anchor="middle">4</text>
+          <rect class="bar-a" x="304" y="112.2" width="20" height="117.8"/><rect class="bar-b" x="326" y="95.95" width="20" height="134.05"/><text x="325" y="250" text-anchor="middle">5</text>
+          <rect class="bar-a" x="364" y="138.4" width="20" height="91.6"/><rect class="bar-b" x="386" y="119.05" width="20" height="110.95"/><text x="385" y="250" text-anchor="middle">6</text>
+          <rect class="bar-a" x="424" y="117" width="20" height="113"/><rect class="bar-b" x="446" y="36.8" width="20" height="193.2"/><text x="445" y="250" text-anchor="middle">7</text>
+          <rect class="bar-a" x="484" y="182.9" width="20" height="47.1"/><rect class="bar-b" x="506" y="204.75" width="20" height="25.25"/><text x="505" y="250" text-anchor="middle">8</text>
+        </svg>
+      </div>
+    </figure>
+  </section>
+
+  <section aria-labelledby="fisica">
+    <h2 id="fisica">La física, leída en el binario</h2>
+    <p>Cada valor sale de un constructor, una tabla constante o una función concreta. Se anotó en un documento propio y desde ahí se reescribió.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Parámetro</th><th>Valor</th><th>Origen</th></tr></thead>
+        <tbody>
+          <tr><td>Gravedad</td><td class="n">(0, −2000, 0) u/s²</td><td>Inicialización global</td></tr>
+          <tr><td>Masa · radio</td><td class="n">1,0 · 55</td><td>Constructores de ActiveGameObject y Ball</td></tr>
+          <tr><td>Restitución</td><td class="n">0,4 × |n.y|</td><td>Constructor de Ball y respuesta al choque</td></tr>
+          <tr><td>Impulso de control</td><td class="n">1750 × (1,4 | 0,25) × dt</td><td>Tabla constante y bucle de control</td></tr>
+          <tr><td>Límite por forma</td><td class="n">800 · 1500 · 800 u/s</td><td>Tabla constante</td></tr>
+          <tr><td>Salto</td><td class="n">1300</td><td>Función de salto (frena al 20 % antes)</td></tr>
+          <tr><td>Velocidad máxima</td><td class="n">2000 u/s</td><td>Constructor de PlayerBall</td></tr>
+          <tr><td>Rozamiento</td><td class="n">100 × cos(pendiente) u/s²</td><td>Respuesta al choque</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="errores">
+    <h2 id="errores">Lo que salió mal, y cómo se vio</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Error</th><th>Síntoma</th><th>Cómo se encontró</th></tr></thead>
+        <tbody>
+          <tr><td>Canales ARGB tomados del enum público</td><td>Bola y logo azules</td><td>Una imagen de color conocido</td></tr>
+          <tr><td>Visor: hijos añadidos durante el recorrido</td><td>Visores en blanco</td><td>Chrome headless con log de consola</td></tr>
+          <tr><td>Cabecera de 84 bytes documentada como 80</td><td>No compilaba</td><td><code>static_assert</code> en C</td></tr>
+          <tr><td>Stride de 12 bytes con 10 de atributos</td><td>Pantalla negra en la consola; Azahar lo aceptaba</td><td>Diferencia emulador ↔ hardware</td></tr>
+          <tr><td>Giro de 3ds Max perdido en la raíz de la bola</td><td>Ojos encima de la bola</td><td>Cámara de depuración frente a la bola</td></tr>
+          <tr><td>Propiedad <code>billboard</code> ignorada</td><td>Recogibles tumbados en el suelo</td><td>Inventario de propiedades</td></tr>
+          <tr><td>Restitución inventada y un umbral de más</td><td>La bola no rebotaba</td><td>Jugando; después, el constructor dio 0,4</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="lessons">
+      <p>No fiarse de la documentación sin probarla.</p>
+      <p>Probar cada salida en su destino real: navegador, emulador y consola.</p>
+      <p>Poner en el código aserciones que comprueben los formatos.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="falta">
+    <h2 id="falta">Lo que falta</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Pieza</th><th>Tamaño</th><th>Por qué</th></tr></thead>
+        <tbody>
+          <tr><td>Cámara que no atraviese el escenario</td><td>Pequeño</td><td>Rayo contra la colisión; luego, la cámara del original</td></tr>
+          <tr><td>Guiones de nivel: 48 verbos</td><td>Grande</td><td>2280 usos; cada verbo se confirma en el binario</td></tr>
+          <tr><td>Objetos móviles y animaciones</td><td>Grande</td><td>Puertas, palancas y plataformas dependen de ellos</td></tr>
+          <tr><td>Formas roca y barro, grupos de colisión</td><td>Medio</td><td>Hay superficies que solo afectan a algunas formas</td></tr>
+          <tr><td>Control táctil</td><td>Medio</td><td>El original se jugaba tocando la pantalla</td></tr>
+          <tr><td>Diálogos, HUD, menús, guardado, audio, .cia</td><td>Medio</td><td>La base de celeste64-3ds ayuda mucho</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>Guía del proyecto Bounce Touch 3DS. El texto completo está en <code>docs/GUIA_PORT.md</code>. No contiene assets ni código del juego original.</footer>
+</main>
