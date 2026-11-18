@@ -9,6 +9,7 @@
 !/port/
 !/tools/
 !/tests/
+!/.github/
 
 port/build/
 port/romfs

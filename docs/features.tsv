@@ -1,0 +1,21 @@
+# area	feature (EN)	función (ES)	status: done | partial | todo
+Engine	Level loading (.hgr → BSC) and 3D rendering	Carga de niveles (.hgr → BSC) y render 3D	done
+Engine	Stereoscopic 3D at 60 FPS	3D estereoscópico a 60 FPS	done
+Engine	Installable .cia without game data (data on SD)	.cia instalable sin datos del juego (datos en la SD)	done
+Gameplay	Ball physics (gravity, bounce, friction, jump)	Física de la bola (gravedad, rebote, rozamiento, salto)	partial
+Gameplay	Collision with the level	Colisión con el nivel	partial
+Gameplay	Camera (springs, heading, idle camera, cutscene guides)	Cámara (muelles, rumbo, cámara de espera, guías de escenas)	done
+Gameplay	Camera avoids walls	La cámara esquiva paredes	todo
+Gameplay	Touch controls (swipe, hold to turn/brake, tap to jump)	Control táctil (deslizar, mantener para girar/frenar, tocar para saltar)	done
+Gameplay	Button controls	Control con botones	partial
+Gameplay	Level scripts (61 verbs)	Guiones de nivel (61 verbos)	partial
+Gameplay	Checkpoints, falls and respawn	Puntos de control, caídas y reaparición	partial
+Gameplay	Ball forms (normal, heavy, light)	Formas de la bola (normal, pesada, ligera)	todo
+Gameplay	Animations (playanimation: ball, enemies, objects)	Animaciones (playanimation: bola, enemigos, objetos)	todo
+Levels	Level 1 playable	Nivel 1 jugable	partial
+Levels	Levels 2–8 playable	Niveles 2–8 jugables	todo
+Interface	Story texts and dialogs	Textos de historia y diálogos	todo
+Interface	HUD (score, lives)	Marcador (puntos, vidas)	todo
+Interface	Menus and world map	Menús y mapa del mundo	todo
+System	Audio (music and effects)	Audio (música y efectos)	todo
+System	Save data	Partida guardada	todo
