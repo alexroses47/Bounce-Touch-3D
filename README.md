@@ -81,8 +81,8 @@ patience. To take it from demo to complete game **we want to build a team of peo
 programming (citro3d), ARM/Symbian reverse engineering, testing on real hardware, and anyone who still has
 the original game and can record reference playthroughs. Open an *issue* or a *discussion* here.
 
-The generic Symbian tools of this project live on in **[RunbIan](https://github.com/alexroses47/RunbIan)**,
-a research runtime for native ports of Symbian games.
+The generic Symbian tools of this project live on in **[E32Recomp](https://github.com/alexroses47/E32Recomp)**,
+a research project on static recompilation of Symbian games (E32 executables → native code + runtime).
 
 ## Building
 
@@ -145,7 +145,8 @@ Harkinian, re3 u OpenGOAL.
   comparadores) y mucha paciencia. Para pasar de demo a juego completo **buscamos formar un equipo de
   personas**: programación en C++ y 3DS, ingeniería inversa de ARM/Symbian, pruebas en consola real y quien
   conserve el juego original y pueda grabar partidas de referencia. Abre un *issue* o una *discussion*.
-- **Herramientas de Symbian:** las genéricas siguen en **[RunbIan](https://github.com/alexroses47/RunbIan)**.
+- **Herramientas de Symbian:** las genéricas siguen en **[E32Recomp](https://github.com/alexroses47/E32Recomp)**,
+  investigación de recompilación estática de juegos de Symbian (ejecutables E32 → código nativo + runtime).
 - **Compilar:** devkitPro con `3ds-dev`, Python 3 y `oggenc`; `port/build.sh` convierte tu copia y compila;
   `port/build.sh release` genera el `.cia` y el `.3dsx` sin datos del juego.
 - **Licencia:** GPL-3.0. El icono, el banner y su sonido son propios.
